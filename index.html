@@ -179,17 +179,17 @@
                 </div>
             </div>
 
-            <form class="contact-form" action="https://formsubmit.co/yeraynavarroyanini@gmail.com" method="POST">
+            <form id="contactForm" action="https://formspree.io/f/xyzdgaja" method="POST" class="contact-form"
+                novalidate>
 
-                <h3>¡Cuéntame tu idea y recibe tu Propuesta Personalizada en 24h!</h3>
+                <h3>¡Cuéntame tu idea y te doy una respuesta personalizada!</h3>
 
-                <input type="text" name="_honey" style="display:none">
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_next" value="https://letdev.es/gracias.html">
+                <input type="hidden" name="_subject" value="Nuevo mensaje desde el portfolio">
+                <input type="hidden" name="page" value="Página de inicio">
 
                 <div class="form-group">
                     <label for="nombre">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <input type="text" id="nombre" name="name" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -197,34 +197,35 @@
                 </div>
                 <div class="form-group">
                     <label for="telefono">Teléfono (Opcional)</label>
-                    <input type="tel" id="telefono" name="telefono">
+                    <input type="tel" id="telefono" name="phone">
                 </div>
                 <div class="form-group">
-                    <label for="tipo">Tipo de Proyecto</label>
-                    <select id="tipo" name="tipo">
-                        <option value="portfolio">Portfolio Express</option>
+                    <label for="tipo">Tipo de Proyecto (Opcional)</label>
+                    <select id="tipo" name="project_type">
+                        <option value="">Selecciona...</option>
+                        <option value="portfolio">Portfolio</option>
                         <option value="web-simple">Web Simple</option>
-                        <option value="arreglo">Arreglo Rápido</option>
-                        <option value="admin">Tareas Administrativas</option>
-                        <option value="mantenimiento">Mantenimiento Web</option>
-                        <option value="otro">Consultoría / Proyecto a Medida</option>
+                        <option value="arreglo">Arreglo de Código / Tarea</option>
+                        <option value="consultoria">Consultoría / Proyecto a Medida</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="mensaje">Mensaje (Sé lo más específico posible)</label>
-                    <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+                    <textarea id="mensaje" name="message" rows="4" required></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-primary btn-block" id="sendBtn">
                     ENVIAR
                 </button>
+                <p class="form-status" id="formStatus" aria-live="polite"></p>
+
 
                 <div class="direct-contact-footer">
                     <p>¿Prefieres no usar el formulario? Contáctame directamente:</p>
                     <a href="https://wa.me/34637659355" target="_blank" class="contact-link">💬 WhatsApp (+34 637 65 93
                         55)</a>
                     |
-                    <a href="mailto:yeraynavarroyanini@gmail.com" class="contact-link">✉️ Email</a>
+                    <a href="mailto:ny93yeray@gmail.com" class="contact-link">✉️ Email</a>
                     |
                     <a href="tel:+34637659355" class="contact-link">📞 Llamar</a>
                 </div>
