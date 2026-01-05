@@ -251,12 +251,47 @@
     <footer class="footer">
         <div class="container footer-content">
             <div class="copyright">
-                &copy; 2025 LetDev. Todos los derechos reservados.
+                &copy; 2026 LetDev. Todos los derechos reservados.
             </div>
         </div>
     </footer>
 
     <script src="script.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'http://localhost:5678/webhook/70e6a2a1-5cac-4971-9f3a-c41e9dcbf62f/chat',
+            webhookConfig: {
+                method: 'POST',
+                headers: {}
+            },
+            target: '#n8n-chat',
+            mode: 'window',
+            chatInputKey: 'chatInput',
+            chatSessionKey: 'sessionId',
+            loadPreviousSession: true,
+            metadata: {},
+            showWelcomeScreen: false,
+            defaultLanguage: 'en',
+            initialMessages: [
+                '¡Hola!👋 Mi nombre es Yeray, es un placer atenderte.'
+            ],
+            i18n: {
+                en: {
+                    title: 'LetDev Chat',
+                    subtitle: "Resolvemos tus dudas a cualquier hora.",
+                    footer: '',
+                    getStarted: 'New Conversation',
+                    inputPlaceholder: '¿En qué podemos ayudarte?',
+                },
+            },
+            enableStreaming: false,
+        });
+    </script>
+    
 </body>
 
 </html>
