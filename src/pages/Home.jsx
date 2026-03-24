@@ -228,7 +228,7 @@ export default function Home() {
 
                 
                 <img
-                      src="/public/images/logo.png"
+                      src="/images/logo.png"
                       alt="LetDev"
                       className="w-48 h-48 object-contain drop-shadow-[0_0_40px_rgba(240,196,25,0.15)]"
                     />
