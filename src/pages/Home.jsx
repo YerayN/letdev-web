@@ -117,7 +117,7 @@ const PROYECTOS = [
     desc:   'Web pública con avisos a la población e intranet de gestión de voluntarios con fichaje, inventario, gestión de eventos, entre otros.',
     tags:   ['React', 'Tailwind CSS', 'Supabase'],
     demo:   'https://pc-aigues-evo.vercel.app/',
-    repo:   '#',
+    repo:   'https://github.com/YerayN/pc-aigues-evo',
   },
   {
     img:    '/images/letdev-proyecto.png',
@@ -125,7 +125,7 @@ const PROYECTOS = [
     desc:   'Landing page corporativa con CRM integrado para gestionar clientes, emitir presupuestos profesionales y controlar la facturación de servicios IT.',
     tags:   ['React', 'Tailwind CSS', 'Supabase'],
     demo:   'https://www.letdev.es/',
-    repo:   '#',
+    repo:   'https://github.com/YerayN/letdev-web',
   },
   {
     img:    '/images/yeray-proyecto.png',
@@ -133,7 +133,7 @@ const PROYECTOS = [
     desc:   'Web personal minimalista desarrollada con React para presentar mi perfil profesional y portafolio de trabajos de forma limpia y directa.',
     tags:   ['React', 'Tailwind CSS'],
     demo:   'https://www.yeraynavarro.com/',
-    repo:   '#',
+    repo:   'https://github.com/YerayN/PortfolioYeray',
   },
 ]
 
