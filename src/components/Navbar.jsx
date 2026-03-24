@@ -19,7 +19,7 @@ export function LetDevLogo({ dark = false, className = '' }) {
       {/* ─── REEMPLAZA ESTO CON TU LOGO ───────────────────────────
           <img src="/src/logo.png" alt="LetDev" className="h-8 w-auto" />
           ──────────────────────────────────────────────────────── */}
-      <img src="/public/images/logo.png" alt="LetDev" className="h-8 w-auto" />
+      <img src="/images/logo.png" alt="LetDev" className="h-8 w-auto" />
       <span className={`font-display font-bold text-[19px] tracking-tight leading-none ${dark ? 'text-navy' : 'text-white'}`}>
         Let<span className="text-gold">Dev</span>
       </span>

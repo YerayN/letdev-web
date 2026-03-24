@@ -17,9 +17,7 @@ export default function PublicLayout() {
 
             {/* Logo + tagline */}
             <div className="flex flex-col gap-3">
-              {/* ─── REEMPLAZA EL SVG POR TU LOGO ───────────────────
-                  <img src="/src/logo.png" alt="LetDev" className="h-8 w-auto" />
-                  ─────────────────────────────────────────────────── */}
+              {<img src="/src/logo.png" alt="LetDev" className="h-8 w-auto" />}
               <LetDevLogo />
               <p className="text-white/30 text-xs max-w-xs leading-relaxed">
                 Desarrollo web y soluciones digitales a medida.<br />
