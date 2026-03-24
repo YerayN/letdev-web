@@ -183,12 +183,12 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-3 mb-10">
-                <Link
-                  to="/contacto"
+                <a
+                  href="/#contacto"
                   className="inline-flex items-center gap-2 bg-gold hover:bg-gold-light text-navy font-semibold text-sm px-6 py-3 rounded-xl transition-colors"
                 >
                   Hablemos de tu proyecto <ArrowRight size={15} />
-                </Link>
+                </a>
                 <a
                   href="#proyectos"
                   className="inline-flex items-center gap-2 bg-white/8 hover:bg-white/12 text-white font-medium text-sm px-6 py-3 rounded-xl border border-white/12 transition-colors"

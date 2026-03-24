@@ -14,11 +14,30 @@ const NAV_LINKS = [
 //   <img src="/src/logo.png" alt="LetDev" className="h-8 w-auto" />
 // El componente acepta `dark` por si lo usas sobre fondos claros en el futuro.
 export function LetDevLogo({ dark = false, className = '' }) {
+  
+  // Esta función se encarga de recargar y subir
+  const handleClick = (e) => {
+  // 1. Evitamos que el enlace haga su comportamiento por defecto un momento
+  // para controlar nosotros el orden de las cosas.
+  
+  if (window.location.pathname === '/') {
+    // 2. Forzamos el scroll al punto 0,0 (arriba a la izquierda)
+    window.scrollTo(0, 0);
+    
+    // 3. Si realmente quieres que la página se recargue (F5):
+    window.location.href = '/'; 
+    
+    // Opcional: Si ves que aún así se queda abajo, usamos este truco:
+    // history.scrollRestoration = 'manual';
+  }
+};
+
   return (
-    <Link to="/" className={`flex items-center gap-2.5 shrink-0 ${className}`}>
-      {/* ─── REEMPLAZA ESTO CON TU LOGO ───────────────────────────
-          <img src="/src/logo.png" alt="LetDev" className="h-8 w-auto" />
-          ──────────────────────────────────────────────────────── */}
+    <Link 
+      to="/" 
+      onClick={handleClick}
+      className={`flex items-center gap-2.5 shrink-0 ${className}`}
+    >
       <img src="/images/logo.png" alt="LetDev" className="h-8 w-auto" />
       <span className={`font-display font-bold text-[19px] tracking-tight leading-none ${dark ? 'text-navy' : 'text-white'}`}>
         Let<span className="text-gold">Dev</span>

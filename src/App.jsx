@@ -8,7 +8,6 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 // Páginas públicas
 import Home       from '@/pages/Home'
 import Servicios  from '@/pages/Servicios'
-import Contacto   from '@/pages/Contacto'
 import Login      from '@/pages/Login'
 
 // Páginas de la intranet
@@ -51,7 +50,6 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/"          element={<Home />} />
           <Route path="/servicios" element={<Servicios />} />
-          <Route path="/contacto"  element={<Contacto />} />
         </Route>
 
         <Route path="/login" element={<Login />} />
