@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Mail, Phone, X, Tag, User, MapPin, Euro, FileText, Loader2, ChevronRight } from 'lucide-react'
+import { Plus, Search, Mail, Phone, X, Tag, User, MapPin, Euro, FileText, Loader2, ChevronRight, Pencil } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -94,17 +94,21 @@ function ModalCliente({ cliente, onClose, onGuardado }) {
           <button onClick={onClose} className="text-navy/30 hover:text-navy p-1"><X size={18} /></button>
         </div>
 
-        {/* Tabs — scroll horizontal en móvil */}
-        <div className="flex gap-1 px-5 pt-3 border-b border-surface-100 overflow-x-auto">
-          {TABS.map(({ key, label }) => (
-            <button key={key} onClick={() => setTab(key)}
-              className={`px-4 py-2 text-xs font-medium rounded-t-lg whitespace-nowrap transition-colors -mb-px border-b-2 ${
-                tab === key ? 'text-navy border-gold' : 'text-navy/40 border-transparent hover:text-navy'
-              }`}>
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Contenedor de las pestañas */}
+          <div className="flex w-full px-5 pt-3 border-b border-surface-100">
+            {TABS.map(({ key, label }) => (
+              <button 
+                key={key} 
+                onClick={() => setTab(key)}
+                /* Aquí hemos añadido flex-1 y text-center */
+                className={`flex-1 text-center py-2 text-xs font-medium rounded-t-lg whitespace-nowrap transition-colors -mb-px border-b-2 ${
+                  tab === key ? 'text-navy border-gold' : 'text-navy/40 border-transparent hover:text-navy'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
         <div className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
           {tab === 'basico' && (
@@ -244,6 +248,12 @@ export default function Clientes() {
     return ok && (filtroEstado === 'todos' || c.estado === filtroEstado)
   })
 
+  // Función para abrir modal en modo edición
+  const abrirEdicion = (e, cliente) => {
+    e.stopPropagation()
+    setModal(cliente)
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -321,6 +331,9 @@ export default function Clientes() {
                       </span>
                     </span>
                     <div className="col-span-1 flex justify-end gap-1">
+                      <button onClick={(e) => abrirEdicion(e, c)} className="p-1.5 rounded hover:bg-surface-100 text-navy/25 hover:text-blue-500 transition-all" title="Editar cliente">
+                        <Pencil size={13} />
+                      </button>
                       {c.email    && <a href={`mailto:${c.email}`}    onClick={e => e.stopPropagation()} className="p-1.5 rounded hover:bg-surface-100 text-navy/25 hover:text-navy"><Mail  size={13} /></a>}
                       {c.telefono && <a href={`tel:${c.telefono}`}    onClick={e => e.stopPropagation()} className="p-1.5 rounded hover:bg-surface-100 text-navy/25 hover:text-navy"><Phone size={13} /></a>}
                       <Link to={`/dashboard/clientes/${c.id}`} onClick={e => e.stopPropagation()}
@@ -351,6 +364,9 @@ export default function Clientes() {
                     <p className="text-xs text-navy/50 truncate">{c.empresa || c.email || '—'}</p>
                   </div>
                   <div className="flex gap-1 shrink-0">
+                    <button onClick={(e) => abrirEdicion(e, c)} className="p-2 rounded-lg bg-surface-100 text-navy/40 hover:text-blue-500 transition-colors">
+                      <Pencil size={14} />
+                    </button>
                     {c.email    && <a href={`mailto:${c.email}`} onClick={e => e.stopPropagation()} className="p-2 rounded-lg bg-surface-100 text-navy/40"><Mail  size={14} /></a>}
                     {c.telefono && <a href={`tel:${c.telefono}`} onClick={e => e.stopPropagation()} className="p-2 rounded-lg bg-surface-100 text-navy/40"><Phone size={14} /></a>}
                     <Link to={`/dashboard/clientes/${c.id}`} onClick={e => e.stopPropagation()}

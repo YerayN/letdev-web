@@ -340,16 +340,7 @@ export default function Home() {
                 {/* Marco decorativo */}
                 <div className="w-64 h-80 rounded-2xl bg-surface-100 border border-surface-200 overflow-hidden flex items-center justify-center">
                   {/* Placeholder foto — reemplázalo con tu <img src="..."> */}
-                  <div className="text-center">
-                    <div className="w-20 h-20 rounded-2xl bg-navy/8 flex items-center justify-center mx-auto mb-3">
-                      <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
-                        <path d="M16 13L10 22L16 31" stroke="#21354F" strokeWidth="2.5" strokeOpacity="0.3" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M28 13L34 22L28 31" stroke="#21354F" strokeWidth="2.5" strokeOpacity="0.3" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="22" cy="22" r="2.5" fill="#21354F" fillOpacity="0.3"/>
-                      </svg>
-                    </div>
-                    <p className="text-navy/30 text-xs font-mono">foto-frontal.png</p>
-                  </div>
+                  <img src="/images/foto-frontal.png" alt="FotoFrontal" className="w-full h-full object-cover object-top" />
                 </div>
                 {/* Chip de localización */}
                 <div className="absolute -bottom-3 -right-3 bg-white border border-surface-200 rounded-xl px-3 py-2 shadow-card text-xs font-mono text-navy/60">

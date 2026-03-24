@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft, Mail, Phone, Globe, MapPin, Building2,
   FileText, FolderKanban, Clock, Edit2, Plus,
-  X, Save, Loader2, ExternalLink, Tag,
+  X, Save, Loader2, ExternalLink, Tag, User,
   Euro, MessageSquare, AlertCircle
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
@@ -13,6 +13,11 @@ import Button from '@/components/ui/Button'
 const eur       = (n) => Number(n||0).toLocaleString('es-ES', { style:'currency', currency:'EUR' })
 const fmtDate   = (d) => d ? new Date(d).toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' }) : '—'
 const fmtDT     = (d) => d ? new Date(d).toLocaleDateString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '—'
+
+const ESTADOS   = ['lead','activo','inactivo','vip','bloqueado']
+const ORIGENES  = ['Web','Referido','Instagram','LinkedIn','Google','Evento','WhatsApp','Otro']
+const SECTORES  = ['Hostelería','Salud','Retail','Tecnología','Educación','Inmobiliaria','Legal','Moda','Servicios','Otro']
+const PRIORIDADES = [{ v:1, l:'Alta' },{ v:2, l:'Media' },{ v:3, l:'Baja' }]
 
 const ESTADO_BADGE = {
   lead:'bg-blue-50 text-blue-500', activo:'bg-emerald-50 text-emerald-600',
@@ -33,6 +38,201 @@ const TIPO_I = {
   whatsapp:{label:'WhatsApp',icon:'💬'}, nota:{label:'Nota',icon:'📝'}, otro:{label:'Otro',icon:'•'},
 }
 
+const CLIENTE_VACIO = {
+  nombre:'', email:'', empresa:'', sector:'', web:'',
+  telefono:'', telefono_alt:'', ciudad:'', provincia:'',
+  pais:'España', direccion:'', codigo_postal:'',
+  estado:'lead', origen:'', prioridad:2,
+  cargo:'', dni:'', condiciones_pago:'', notas:'', etiquetas:'',
+}
+
+// ── Subcomponentes del Modal Cliente ──────────────────────────────────
+function SeccionForm({ titulo, icon: Icon, children }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-surface-100">
+        <Icon size={13} className="text-navy/30" />
+        <span className="text-[10px] font-mono uppercase tracking-widest text-navy/40">{titulo}</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
+    </div>
+  )
+}
+
+function Campo({ label, full = false, children }) {
+  return (
+    <div className={full ? 'sm:col-span-2' : ''}>
+      <label className="block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function ModalCliente({ cliente, onClose, onGuardado }) {
+  const editando = !!cliente?.id
+  const [form,    setForm]    = useState(cliente ? { ...cliente, etiquetas: (cliente.etiquetas || []).join(', ') } : CLIENTE_VACIO)
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState(null)
+  const [tab,     setTab]     = useState('basico')
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const guardar = async () => {
+    if (!form.nombre.trim()) { setError('El nombre es obligatorio.'); return }
+    setLoading(true); setError(null)
+    const payload = {
+      ...form,
+      etiquetas: form.etiquetas ? form.etiquetas.split(',').map(t => t.trim()).filter(Boolean) : [],
+      prioridad: Number(form.prioridad),
+    }
+    Object.keys(payload).forEach(k => { if (payload[k] === '') payload[k] = null })
+    const { error: err } = editando
+      ? await supabase.from('clientes').update(payload).eq('id', cliente.id)
+      : await supabase.from('clientes').insert(payload)
+    if (err) { setError(err.message); setLoading(false); return }
+    setLoading(false); onGuardado()
+  }
+
+  const TABS = [
+    { key:'basico',   label:'Básico'   },
+    { key:'contacto', label:'Contacto' },
+    { key:'crm',      label:'CRM'      },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{ background:'rgba(15,30,50,0.55)' }}>
+      <div className="bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] animate-slide-up">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-surface-100">
+          <h2 className="font-display font-bold text-navy text-base">
+            {editando ? `Editar — ${cliente.nombre}` : 'Nuevo cliente'}
+          </h2>
+          <button onClick={onClose} className="text-navy/30 hover:text-navy p-1"><X size={18} /></button>
+        </div>
+        {/* Contenedor de las pestañas */}
+        <div className="flex w-full px-5 pt-3 border-b border-surface-100">
+          {TABS.map(({ key, label }) => (
+            <button 
+              key={key} 
+              onClick={() => setTab(key)}
+              /* Aquí hemos añadido flex-1 y text-center */
+              className={`flex-1 text-center py-2 text-xs font-medium rounded-t-lg whitespace-nowrap transition-colors -mb-px border-b-2 ${
+                tab === key ? 'text-navy border-gold' : 'text-navy/40 border-transparent hover:text-navy'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
+          {tab === 'basico' && (
+            <SeccionForm titulo="Identificación" icon={User}>
+              <Campo label="Nombre *" full>
+                <input className="input-field" value={form.nombre} onChange={e => set('nombre', e.target.value)} placeholder="Nombre completo" />
+              </Campo>
+              <Campo label="Empresa">
+                <input className="input-field" value={form.empresa || ''} onChange={e => set('empresa', e.target.value)} placeholder="Empresa" />
+              </Campo>
+              <Campo label="Cargo">
+                <input className="input-field" value={form.cargo || ''} onChange={e => set('cargo', e.target.value)} placeholder="CEO, Responsable IT..." />
+              </Campo>
+              <Campo label="Sector">
+                <select className="input-field" value={form.sector || ''} onChange={e => set('sector', e.target.value)}>
+                  <option value="">Sin sector</option>
+                  {SECTORES.map(s => <option key={s}>{s}</option>)}
+                </select>
+              </Campo>
+              <Campo label="Web" full>
+                <input className="input-field" value={form.web || ''} onChange={e => set('web', e.target.value)} placeholder="https://..." />
+              </Campo>
+            </SeccionForm>
+          )}
+          {tab === 'contacto' && (
+            <>
+              <SeccionForm titulo="Contacto" icon={Phone}>
+                <Campo label="Email">
+                  <input className="input-field" type="email" value={form.email || ''} onChange={e => set('email', e.target.value)} placeholder="correo@ejemplo.com" />
+                </Campo>
+                <Campo label="Teléfono">
+                  <input className="input-field" value={form.telefono || ''} onChange={e => set('telefono', e.target.value)} placeholder="+34 600 000 000" />
+                </Campo>
+                <Campo label="Teléfono alternativo">
+                  <input className="input-field" value={form.telefono_alt || ''} onChange={e => set('telefono_alt', e.target.value)} />
+                </Campo>
+              </SeccionForm>
+              <SeccionForm titulo="Localización" icon={MapPin}>
+                <Campo label="Ciudad">
+                  <input className="input-field" value={form.ciudad || ''} onChange={e => set('ciudad', e.target.value)} placeholder="Alicante" />
+                </Campo>
+                <Campo label="Provincia">
+                  <input className="input-field" value={form.provincia || ''} onChange={e => set('provincia', e.target.value)} />
+                </Campo>
+                <Campo label="CP">
+                  <input className="input-field" value={form.codigo_postal || ''} onChange={e => set('codigo_postal', e.target.value)} />
+                </Campo>
+                <Campo label="País">
+                  <input className="input-field" value={form.pais || ''} onChange={e => set('pais', e.target.value)} />
+                </Campo>
+                <Campo label="Dirección" full>
+                  <input className="input-field" value={form.direccion || ''} onChange={e => set('direccion', e.target.value)} />
+                </Campo>
+              </SeccionForm>
+              <SeccionForm titulo="Datos fiscales" icon={FileText}>
+                <Campo label="DNI / CIF">
+                  <input className="input-field" value={form.dni || ''} onChange={e => set('dni', e.target.value)} />
+                </Campo>
+              </SeccionForm>
+            </>
+          )}
+          {tab === 'crm' && (
+            <>
+              <SeccionForm titulo="Estado y origen" icon={Tag}>
+                <Campo label="Estado">
+                  <select className="input-field" value={form.estado} onChange={e => set('estado', e.target.value)}>
+                    {ESTADOS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>)}
+                  </select>
+                </Campo>
+                <Campo label="Origen">
+                  <select className="input-field" value={form.origen || ''} onChange={e => set('origen', e.target.value)}>
+                    <option value="">Sin especificar</option>
+                    {ORIGENES.map(o => <option key={o}>{o}</option>)}
+                  </select>
+                </Campo>
+                <Campo label="Prioridad">
+                  <select className="input-field" value={form.prioridad} onChange={e => set('prioridad', e.target.value)}>
+                    {PRIORIDADES.map(p => <option key={p.v} value={p.v}>{p.l}</option>)}
+                  </select>
+                </Campo>
+                <Campo label="Etiquetas (separadas por coma)">
+                  <input className="input-field" value={form.etiquetas || ''} onChange={e => set('etiquetas', e.target.value)} placeholder="wordpress, recurrente" />
+                </Campo>
+              </SeccionForm>
+              <SeccionForm titulo="Condiciones" icon={Euro}>
+                <Campo label="Condiciones de pago" full>
+                  <input className="input-field" value={form.condiciones_pago || ''} onChange={e => set('condiciones_pago', e.target.value)} placeholder="Contado, 30 días..." />
+                </Campo>
+                <Campo label="Fecha de nacimiento">
+                  <input className="input-field" type="date" value={form.fecha_nacimiento || ''} onChange={e => set('fecha_nacimiento', e.target.value)} />
+                </Campo>
+              </SeccionForm>
+            </>
+          )}
+        </div>
+        <div className="px-5 py-4 border-t border-surface-100 flex items-center justify-between gap-3">
+          {error ? <p className="text-xs text-red-500 flex-1">{error}</p> : <span className="flex-1" />}
+          <div className="flex gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={onClose}>Cancelar</Button>
+            <Button size="sm" loading={loading} onClick={guardar}>
+              {editando ? 'Guardar' : 'Crear cliente'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Modal de Interacciones ────────────────────────────────────────────
 function ModalInteraccion({ clienteId, onClose, onGuardado }) {
   const [form, setForm] = useState({ tipo:'llamada', titulo:'', descripcion:'', fecha:new Date().toISOString().slice(0,16), duracion_min:'' })
   const [loading, setLoading] = useState(false)
@@ -56,7 +256,7 @@ function ModalInteraccion({ clienteId, onClose, onGuardado }) {
         </div>
         <div className="px-5 py-5 space-y-4">
           <div>
-            <label className="lbl">Tipo</label>
+            <label className="lbl block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">Tipo</label>
             <div className="flex flex-wrap gap-2">
               {Object.entries(TIPO_I).map(([key,{label,icon}]) => (
                 <button key={key} onClick={() => set('tipo',key)}
@@ -67,22 +267,22 @@ function ModalInteraccion({ clienteId, onClose, onGuardado }) {
             </div>
           </div>
           <div>
-            <label className="lbl">Título *</label>
-            <input className="input-field" value={form.titulo} onChange={e=>set('titulo',e.target.value)} placeholder="Ej: Llamada para revisar avance" />
+            <label className="lbl block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">Título *</label>
+            <input className="input-field w-full" value={form.titulo} onChange={e=>set('titulo',e.target.value)} placeholder="Ej: Llamada para revisar avance" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="lbl">Fecha y hora</label>
-              <input type="datetime-local" className="input-field" value={form.fecha} onChange={e=>set('fecha',e.target.value)} />
+              <label className="lbl block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">Fecha y hora</label>
+              <input type="datetime-local" className="input-field w-full" value={form.fecha} onChange={e=>set('fecha',e.target.value)} />
             </div>
             <div>
-              <label className="lbl">Duración (min)</label>
-              <input type="number" className="input-field" value={form.duracion_min} onChange={e=>set('duracion_min',e.target.value)} placeholder="30" />
+              <label className="lbl block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">Duración (min)</label>
+              <input type="number" className="input-field w-full" value={form.duracion_min} onChange={e=>set('duracion_min',e.target.value)} placeholder="30" />
             </div>
           </div>
           <div>
-            <label className="lbl">Notas</label>
-            <textarea rows={3} className="input-field resize-none" value={form.descripcion} onChange={e=>set('descripcion',e.target.value)} placeholder="Resumen, acuerdos..." />
+            <label className="lbl block text-[10px] font-mono uppercase tracking-widest text-navy/40 mb-1">Notas</label>
+            <textarea rows={3} className="input-field resize-none w-full" value={form.descripcion} onChange={e=>set('descripcion',e.target.value)} placeholder="Resumen, acuerdos..." />
           </div>
         </div>
         <div className="px-5 py-4 border-t border-surface-100 flex justify-end gap-2">
@@ -118,6 +318,7 @@ export default function ClienteDetalle() {
   const [interacciones, setInteracciones] = useState([])
   const [loading,       setLoading]       = useState(true)
   const [modalI,        setModalI]        = useState(false)
+  const [modalEdit,     setModalEdit]     = useState(false) // <-- ESTADO PARA EL MODAL DE EDICIÓN
   const [notas,         setNotas]         = useState('')
   const [editNotas,     setEditNotas]     = useState(false)
   const [guardNotas,    setGuardNotas]    = useState(false)
@@ -168,6 +369,16 @@ export default function ClienteDetalle() {
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="font-display font-bold text-xl md:text-2xl text-navy tracking-tight">{cliente.nombre}</h1>
                 {cliente.estado && <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full capitalize ${ESTADO_BADGE[cliente.estado]||'bg-surface-100 text-navy/40'}`}>{cliente.estado}</span>}
+                
+                {/* BOTÓN DE EDITAR AÑADIDO AQUÍ */}
+                <button 
+                  onClick={() => setModalEdit(true)} 
+                  className="p-1.5 rounded-md hover:bg-surface-100 text-navy/40 hover:text-blue-500 transition-all ml-1" 
+                  title="Editar datos del cliente"
+                >
+                  <Edit2 size={16}/>
+                </button>
+
               </div>
               {cliente.empresa && <p className="text-navy/50 text-sm mt-0.5">{cliente.empresa}</p>}
               {cliente.cargo   && <p className="text-navy/35 text-xs">{cliente.cargo}</p>}
@@ -346,7 +557,16 @@ export default function ClienteDetalle() {
             </Card.Body></Card>}
       </Seccion>
 
+      {/* MODALES REUTILIZADOS */}
       {modalI && <ModalInteraccion clienteId={id} onClose={() => setModalI(false)} onGuardado={() => {setModalI(false);cargar()}}/>}
+      
+      {modalEdit && (
+        <ModalCliente 
+          cliente={cliente} 
+          onClose={() => setModalEdit(false)} 
+          onGuardado={() => { setModalEdit(false); cargar(); }} 
+        />
+      )}
     </div>
   )
 }
